@@ -3,12 +3,7 @@ package com.experiment.mslab.beacondetection;
 import android.Manifest;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-import android.bluetooth.le.BluetoothLeAdvertiser;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.support.annotation.NonNull;
@@ -21,13 +16,15 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.experiment.mslab.beacondetection.R;
 import com.hereapps.ibeacon.IBeacon;
 import com.hereapps.ibeacon.IBeaconLibrary;
 import com.hereapps.ibeacon.IBeaconListener;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
 
@@ -35,11 +32,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private final int PERMISSION_REQUEST_COARSE_LOCATION = 0xb01;
 
     private String TAG = "BtDetection";
+    private TextView tv_title;
 
     private static ArrayList<IBeacon> iBeacons;
     private ArrayAdapter<IBeacon> iBeaconAdapter;
     private IBeaconLibrary iBeaconLibrary;
-    private ArrayAdapter<String> mAdapter;
     private static BluetoothAdapter mBtAdapter;
 
     @Override
@@ -57,18 +54,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         }
 
-//        IntentFilter filterFound = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-//        registerReceiver(mReceiver, filterFound);
-//
-//        IntentFilter filterStart = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_STARTED);
-//        registerReceiver(mReceiver, filterStart);
-//
-//        IntentFilter filterFinish = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
-//        registerReceiver(mReceiver, filterFinish);
-
         if(iBeacons == null)
             iBeacons = new ArrayList<IBeacon>();
-//        mAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, android.R.id.text1);
         iBeaconAdapter = new ArrayAdapter<IBeacon>(this, android.R.layout.simple_list_item_1, android.R.id.text1, iBeacons) {
             @Override
             public View getView(int position, View convertView, ViewGroup parent) {
@@ -83,13 +70,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 " Minor: " + beacon.getMinor() +
                                 " Distance: " + beacon.getProximity() + "m.";
 
-                textView.setText(beacon.getUuidHexStringDashed());
-                textView2.setText(beaconDetail);
+                textView.setText(beaconDetail);
+                textView2.setText(beacon.getUuidHexStringDashed());
                 return view;
             }
         };
 
-//        listView.setAdapter(mAdapter);
         listView.setAdapter(iBeaconAdapter);
         iBeaconLibrary = IBeaconLibrary.getInstance();
         iBeaconLibrary.setListener(iBeaconListener);
@@ -103,37 +89,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.button_scan:
-//                discovery();
                 iBeacons.clear();
                 iBeaconAdapter.notifyDataSetChanged();
                 scanBeacons();
                 break;
         }
     }
-
-//    private BroadcastReceiver mReceiver = new BroadcastReceiver() {
-//        @Override
-//        public void onReceive(Context context, Intent intent) {
-//            String action = intent.getAction();
-//
-//            if (BluetoothAdapter.ACTION_DISCOVERY_STARTED.equals(action)) {
-//                Log.d(TAG, "Discovery started...");
-//            }
-//
-//            if (BluetoothDevice.ACTION_FOUND.equals(action)) {
-//                Log.d(TAG, "Device found.");
-//                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-//                if (device != null) {
-//                    mAdapter.add("Device: " + device.getName() + "\nAddress: " + device.getAddress());
-//                    mAdapter.notifyDataSetChanged();
-//                }
-//            }
-//
-//            if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
-//                Log.d(TAG, "Discovery finished.");
-//            }
-//        }
-//    };
 
     private void init() {
         mBtAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -152,14 +113,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         iBeaconLibrary.setBluetoothAdapter(this);
     }
-//
-//    private void discovery() {
-//        if (mBtAdapter == null) {
-//            init();
-//        }
-//        Log.d(TAG, "Method discovery.");
-//        mBtAdapter.startDiscovery();
-//    }
 
     private void scanBeacons() {
         Log.i(IBeaconLibrary.LOG_TAG,"Scanning");
@@ -178,7 +131,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onDestroy() {
         super.onDestroy();
-//        unregisterReceiver(mReceiver);
     }
 
     @Override
@@ -203,16 +155,28 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private IBeaconListener iBeaconListener = new IBeaconListener() {
         @Override
         public void beaconEnter(IBeacon iBeacon) {
-
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm:ss");
+            Date date = new Date(System.currentTimeMillis());
+//            tv_title.setText("Enter time:" + simpleDateFormat.format(date));
+            String text = "Enter time:" + simpleDateFormat.format(date);
+            Toast toast = Toast.makeText(MainActivity.this, text, Toast.LENGTH_SHORT);
+            toast.show();
         }
 
         @Override
         public void beaconExit(IBeacon iBeacon) {
-
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm:ss");
+            Date date = new Date(System.currentTimeMillis());
+//            tv_title.setText("Exit time:" + simpleDateFormat.format(date));
+            String text = "Exit time:" + simpleDateFormat.format(date);
+            Toast toast = Toast.makeText(MainActivity.this, text, Toast.LENGTH_SHORT);
+            toast.show();
         }
 
         @Override
         public void beaconFound(IBeacon iBeacon) {
+            Toast toast = Toast.makeText(MainActivity.this, "Found beacon!", Toast.LENGTH_SHORT);
+            toast.show();
             iBeacons.add(iBeacon);
             runOnUiThread(new Runnable() {
                 @Override

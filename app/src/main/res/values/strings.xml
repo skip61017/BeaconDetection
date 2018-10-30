@@ -1,5 +1,5 @@
 <resources>
     <string name="app_name">BeaconDetection</string>
-    <string name="text_title">Name: Major, Minor, Distance\n [Mac Addr ]</string>
+    <string name="text_title"> Major, Minor, Distance\n [Mac Addr]</string>
     <string name="btn_scan">SCAN</string>
 </resources>
